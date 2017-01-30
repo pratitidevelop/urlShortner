@@ -47,6 +47,10 @@
                 if(!result.error){
                   //alert('shortened url :'+result.shortenedurl);
                   $('#displayShortUrl').html(result.shortenedurl);
+                }else{
+                  if(result.reason == 'url not correct'){
+                    $('#displayShortUrl').html('not a correct url');
+                  }
                 }
               }
           });

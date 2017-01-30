@@ -10,14 +10,12 @@ var checkValidUrl = function ( req, res, next){
         next();
     }else{
         return res.json({
-          error : true
+          error : true ,
+          reason : 'url not correct'
         });
     }
 
 }
-
-
-
 
 
 /* GET home page. */
@@ -25,23 +23,8 @@ router.get('/', function(req, res, next) {
   res.render('getUrlToShort', { title: 'UrlShortner' });
 });
 
-
-router.get('/:shorturl', function (req, res, next){
-
-  var shorturlfromUser = req.params.shorturl ;
-  UrlShort.findOne({ shortenedUrl : shorturlfromUser })
-    .exec( function (err, url){
-      if(err){
-        res.send('ERROR');
-      }else{
-        res.redirect(url.originalUrl);
-      }
-    });
-});
-
-
 router.post('/', checkValidUrl , function (req, res){
-  
+
 
     var shorturl = shortid.generate();
     var obj ={
@@ -64,5 +47,28 @@ router.post('/', checkValidUrl , function (req, res){
       }
     });
 });
+
+router.get('/:shorturl', function (req, res, next){
+
+  var shorturlfromUser = req.params.shorturl ;
+  UrlShort.findOne({ shortenedUrl : shorturlfromUser })
+    .exec( function (err, url){
+      if(err || url === null){
+        res.send('ERROR');
+      }else{
+        //console.log(url);
+          var match = url.originalUrl.match(/^https:\/\/|http:\/\//);
+          if(match === null){
+            res.redirect('http://'+url.originalUrl);
+          }
+         else{
+          res.redirect( url.originalUrl );
+        }
+      }
+    });
+});
+
+
+
 
 module.exports = router;
